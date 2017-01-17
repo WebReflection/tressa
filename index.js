@@ -7,7 +7,7 @@
 function test(condition, message) {
   try {
     console.assert.apply(console, arguments);
-    if (typeof message === 'string') {
+    if (typeof message === 'string' && condition) {
       test.console.log('#green(✔) ' + message);
     }
   } catch(error) {
@@ -69,7 +69,7 @@ test.end = function () {
 // show stats on exit, if any, on node
 if (!process.browser) process.on('exit', function () {
   test.end();
-  process.exit(test.exitCode);
+  process.exit(test.exitCode || 0);
 });
 
 module.exports = test;
