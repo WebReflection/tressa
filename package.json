@@ -1,0 +1,33 @@
+{
+  "name": "tressa",
+  "version": "0.1.0",
+  "description": "A little test utility",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js || exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebReflection/tressa.git"
+  },
+  "keywords": [
+    "test",
+    "async",
+    "tests",
+    "assert",
+    "console",
+    "tiny",
+    "small",
+    "utility"
+  ],
+  "author": "Andrea Giammarchi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WebReflection/tressa/issues"
+  },
+  "homepage": "https://github.com/WebReflection/tressa#readme",
+  "devDependencies": {},
+  "dependencies": {
+    "consolemd": "^0.1.2"
+  }
+}
