@@ -38,7 +38,7 @@ test.async(done => {
 test.async = function (fn, timeout) {
   var timer = setTimeout(
     function () {
-      test(false, fn.name);
+      test(false, '*timeout* ' + (fn.name || fn));
     },
     timeout || test.timeout
   );
