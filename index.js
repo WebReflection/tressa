@@ -1,11 +1,5 @@
 /*! (C) 2017 Andrea Giammarchi & Claudio D'angelis */
 
-var
-  consolemd = require('consolemd'),
-  exitCode = 0,
-  title
-;
-
 // used to assert conditions
 // equivalent of console.assert(...args)
 // test(true)
@@ -14,19 +8,19 @@ function test(condition, message) {
   try {
     console.assert.apply(console, arguments);
     if (typeof message === 'string') {
-      consolemd.log('#green(✔) ' + message);
+      test.console.log('#green(✔) ' + message);
     }
   } catch(error) {
-    exitCode = 1;
-    consolemd.error('#red(✖) ' + error);
+    test.exitCode = 1;
+    test.console.error('#red(✖) ' + error);
   }
 }
 
 // on top of the test to show a nice title
 // test.title('My Library');
-test.title = function (testName) {
-  title = testName;
-  consolemd.info('# ' + title);
+test.title = function (title) {
+  test.testName = title;
+  test.console.info('# ' + title);
   console.time(title);
 };
 
@@ -37,7 +31,6 @@ test.async(done => {
   test(1);
   setTimeout(() => {
     test(2);
-    // once finished
     done();
   });
 });
@@ -59,17 +52,24 @@ test.timeout = 10000;
 test.sync = test;
 
 // to log Markdown like strings
-test.log = consolemd.log;
+test.console = require('consolemd');
+test.log = test.console.log;
 
-// show stats on exit, if possible
-process.on('exit', function () {
+// to end on browsers
+test.end = function () {
+  var title = test.testName;
   if (title) {
     console.log(Array(title.length + 10).join('─'));
     console.timeEnd(title);
     console.log('');
-    title = '';
+    test.testName = '';
   }
-  process.exit(exitCode);
+};
+
+// show stats on exit, if any, on node
+if (!process.browser) process.on('exit', function () {
+  test.end();
+  process.exit(test.exitCode);
 });
 
 module.exports = test;
