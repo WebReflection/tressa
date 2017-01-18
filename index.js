@@ -49,7 +49,7 @@ test.async = function (fn, timeout) {
 test.timeout = 10000;
 
 // for synchronous tests (alias)
-test.sync = test;
+test.assert = test.sync = test;
 
 // to log Markdown like strings
 test.console = require('consolemd');

@@ -9,8 +9,8 @@ test(0); // error shown
 test(0 === 1, 'zero is one');
 
 // same via sync
-test.sync(1);
-test.sync(0);
+test.assert(1);
+test.assert(0);
 test.sync(1, 'all good');
 test.sync(0, 'fail');
 
