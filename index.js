@@ -7,6 +7,8 @@
 function test(condition, message) {
   try {
     console.assert.apply(console, arguments);
+    // in order to read or know failures on browsers
+    if (!condition) test.exitCode = 1;
     if (typeof message === 'string' && condition) {
       test.console.log('#green(✔) ' + message);
     }
