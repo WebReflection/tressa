@@ -26,7 +26,7 @@ test.async(function (done) {
 });
 
 // force expiration
-test.async(
+var p = test.async(
   function goingToExpire(done) {
     setTimeout(function () {
       test.log('## Expired Async');
@@ -39,3 +39,18 @@ test.async(
   // default timeout is 10000 (10 seconds)
   100
 );
+if (p) p.catch(function (rej) {
+  test(true, 'expired with: ' + rej);
+});
+
+// test Promise
+if (typeof Promise !== 'undefined') {
+  test.async(function (done) {
+    setTimeout(function () {
+      test.log('## Promise chained Async');
+      done(123);
+    });
+  }).then(function (value) {
+    test(value === 123, 'Promise invoked');
+  });
+}

@@ -13,12 +13,16 @@ test.title('My Library');
 test(condition, 'optional comment');
 
 // asynchronous
-test.async(done => {
-  setTimeout(() => {
-    test(condition, 'optional comment');
-    done();
+test
+  .async(done => {
+    setTimeout(() => {
+      test(condition, 'optional comment');
+      done();
+    });
+  })
+  .then(() => {
+    console.log("That's it!");
   });
-});
 ```
 
 (C) 2017 MIT Style License
