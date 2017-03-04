@@ -38,13 +38,28 @@ tressa.async(done => {
 });
 */
 tressa.async = function (fn, timeout) {
-  var timer = setTimeout(
-    function () {
-      tressa(false, '*timeout* ' + (fn.name || fn));
-    },
-    timeout || tressa.timeout
-  );
-  fn(function () { clearTimeout(timer); });
+  var
+    resolve = Object,
+    reject = Object,
+    timer = setTimeout(
+      function () {
+        var reason = '*timeout* ' + (fn.name || fn);
+        reject(reason);
+        tressa(false, reason);
+      },
+      timeout || tressa.timeout
+    )
+  ;
+  fn(function () {
+    resolve.apply(null, arguments);
+    clearTimeout(timer);
+  });
+  return typeof Promise !== 'undefined' ?
+    new Promise(function (res, rej) {
+      resolve = res;
+      reject = rej;
+    }) :
+    null;
 };
 
 // default expiring timeout
@@ -57,7 +72,9 @@ try {
   // to log Markdown like strings
   tressa.console = require('consolemd');
 } catch(o_O) {
-  tressa.console = console;
+  tressa.console =
+    typeof consolemd === 'undefined' ?
+      console : consolemd;
 }
 tressa.log = tressa.console.log;
 
