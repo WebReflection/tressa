@@ -1,6 +1,6 @@
 {
   "name": "tressa",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A little test utility",
   "main": "index.js",
   "scripts": {
