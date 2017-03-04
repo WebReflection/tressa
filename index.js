@@ -50,9 +50,11 @@ tressa.async = function (fn, timeout) {
       timeout || tressa.timeout
     )
   ;
-  fn(function () {
-    resolve.apply(null, arguments);
-    clearTimeout(timer);
+  setTimeout(function () {
+    fn(function () {
+      resolve.apply(null, arguments);
+      clearTimeout(timer);
+    });
   });
   return typeof Promise !== 'undefined' ?
     new Promise(function (res, rej) {
