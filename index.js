@@ -2,76 +2,76 @@
 
 // used to assert conditions
 // equivalent of console.assert(...args)
-// test(true)
-// test(true, 'what am I testing')
-function test(condition, message) {
+// tressa(true)
+// tressa(true, 'what am I testing')
+function tressa(condition, message) {
   try {
     console.assert.apply(console, arguments);
     // in order to read or know failures on browsers
-    if (!condition) test.exitCode = 1;
+    if (!condition) tressa.exitCode = 1;
     if (typeof message === 'string' && condition) {
-      test.console.log('#green(✔) ' + message);
+      tressa.console.log('#green(✔) ' + message);
     }
   } catch(error) {
-    test.exitCode = 1;
-    test.console.error('#red(✖) ' + error);
+    tressa.exitCode = 1;
+    tressa.console.error('#red(✖) ' + error);
   }
 }
 
 // on top of the test to show a nice title
 // test.title('My Library');
-test.title = function (title) {
-  test.testName = title;
-  test.console.info('# ' + title);
+tressa.title = function (title) {
+  tressa.testName = title;
+  tressa.console.info('# ' + title);
   console.time(title);
 };
 
 // for asynchronous tests
 /*
-test.async(done => {
+tressa.async(done => {
   // later on ...
-  test(1);
+  tressa(1);
   setTimeout(() => {
-    test(2);
+    tressa(2);
     done();
   });
 });
 */
-test.async = function (fn, timeout) {
+tressa.async = function (fn, timeout) {
   var timer = setTimeout(
     function () {
-      test(false, '*timeout* ' + (fn.name || fn));
+      tressa(false, '*timeout* ' + (fn.name || fn));
     },
-    timeout || test.timeout
+    timeout || tressa.timeout
   );
   fn(function () { clearTimeout(timer); });
 };
 
 // default expiring timeout
-test.timeout = 10000;
+tressa.timeout = 10000;
 
 // for synchronous tests (alias)
-test.assert = test.sync = test;
+tressa.assert = tressa.sync = tressa;
 
 // to log Markdown like strings
-test.console = require('consolemd');
-test.log = test.console.log;
+tressa.console = require('consolemd');
+tressa.log = tressa.console.log;
 
 // to end on browsers
-test.end = function () {
-  var title = test.testName;
+tressa.end = function () {
+  var title = tressa.testName;
   if (title) {
     console.log(Array(title.length + 10).join('─'));
     console.timeEnd(title);
     console.log('');
-    test.testName = '';
+    tressa.testName = '';
   }
 };
 
 // show stats on exit, if any, on node
 if (!process.browser) process.on('exit', function () {
-  test.end();
-  process.exit(test.exitCode || 0);
+  tressa.end();
+  process.exit(tressa.exitCode || 0);
 });
 
-module.exports = test;
+try { module.exports = tressa; } catch(o_O) {}
