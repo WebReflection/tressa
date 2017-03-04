@@ -72,10 +72,11 @@ tressa.end = function () {
   }
 };
 
-// show stats on exit, if any, on node
-if (!process.browser) process.on('exit', function () {
-  tressa.end();
-  process.exit(tressa.exitCode || 0);
-});
-
-try { module.exports = tressa; } catch(o_O) {}
+try {
+  // show stats on exit, if any, on node
+  if (!process.browser) process.on('exit', function () {
+    tressa.end();
+    process.exit(tressa.exitCode || 0);
+  });
+  module.exports = tressa;
+} catch(o_O) {}
