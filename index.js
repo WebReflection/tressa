@@ -53,8 +53,12 @@ tressa.timeout = 10000;
 // for synchronous tests (alias)
 tressa.assert = tressa.sync = tressa;
 
-// to log Markdown like strings
-tressa.console = require('consolemd');
+try {
+  // to log Markdown like strings
+  tressa.console = require('consolemd');
+} catch(o_O) {
+  tressa.console = console;
+}
 tressa.log = tressa.console.log;
 
 // to end on browsers
