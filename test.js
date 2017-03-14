@@ -23,6 +23,10 @@ test.async(function (done) {
     test(0, 'Async *issue*');
     done();
   }, 250);
+}).then(function () {
+  test.async(function () {
+    unhandledException();
+  });
 });
 
 // force expiration

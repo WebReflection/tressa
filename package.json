@@ -7,7 +7,7 @@
     "test": "node test.js || exit 0",
     "browserify": "browserify tressa.js -o tmp.js",
     "minify": "uglifyjs tmp.js --comments=/Giammarchi.*Claudio/ --compress --mangle -o tressa.js",
-    "browser": "echo 'global.tressa=require(\"./\")'>tressa.js;npm run browserify;npm run minify;rm tmp.js"
+    "build": "echo 'global.tressa=require(\"./\")'>tressa.js;npm run browserify;npm run minify;rm tmp.js"
   },
   "repository": {
     "type": "git",

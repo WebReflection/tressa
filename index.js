@@ -93,9 +93,16 @@ tressa.end = function () {
 
 try {
   // show stats on exit, if any, on node
-  if (!process.browser) process.on('exit', function () {
-    tressa.end();
-    process.exit(tressa.exitCode || 0);
-  });
+  if (!process.browser) {
+    process.on('exit', function () {
+      tressa.end();
+      process.exit(tressa.exitCode || 0);
+    });
+    process.on('uncaughtException', function (error) {
+      tressa.exitCode = 1;
+      tressa.console.error('#red(✖) ' + error);
+      process.emit('exit');
+    });
+  }
   module.exports = tressa;
 } catch(o_O) {}
