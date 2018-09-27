@@ -45,7 +45,7 @@ tressa.async = function (fn, timeout) {
     reject = Object,
     timer = setTimeout(
       function () {
-        var reason = '*timeout* ' + (fn.name || fn);
+        var reason = '*timeout (' + (timeout || tressa.timeout) + 'ms)* ' + (fn.name || fn);
         reject(reason);
         tressa(false, reason);
       },
