@@ -2,12 +2,13 @@
   "name": "tressa",
   "version": "0.4.0",
   "description": "A little test utility",
-  "main": "index.js",
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "browser": "min.js",
+  "pkg": "min.js",
   "scripts": {
     "test": "node test.js || exit 0",
-    "browserify": "browserify tressa.js -o tmp.js",
-    "minify": "uglifyjs tmp.js --comments=/Giammarchi.*Claudio/ --compress --mangle -o tressa.js",
-    "build": "echo 'global.tressa=require(\"./\")'>tressa.js;npm run browserify;npm run minify;rm tmp.js"
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -24,16 +25,23 @@
     "utility"
   ],
   "author": "Andrea Giammarchi",
+  "contributors": [
+    "Brett Zamir"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/WebReflection/tressa/issues"
   },
+  "engines": {
+    "node": "*"
+  },
   "homepage": "https://github.com/WebReflection/tressa#readme",
   "devDependencies": {
-    "browserify": "^13.3.0",
-    "uglify-js": "^2.7.5"
+    "rollup": "0.66.2",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-terser": "^3.0.0"
   },
   "dependencies": {
-    "consolemd": "^0.1.2"
+    "consolemd": "https://github.com/brettz9/consolemd#es"
   }
 }

@@ -1,5 +1,6 @@
 .DS_Store
 .travis.yml
 .gitignore
+core.js
 test.js
 node_modules/*
