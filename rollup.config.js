@@ -25,5 +25,12 @@ export default [
   getConfig({format: 'cjs', min: true}),
   getConfig({format: 'cjs', min: false}),
   getConfig({format: 'es', min: true}),
-  getConfig({format: 'es', min: false})
+  getConfig({format: 'es', min: false}),
+  {
+    input: 'test/test.js',
+    output: {
+      format: 'cjs',
+      file: 'test/test-cjs.js'
+    }
+  }
 ];

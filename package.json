@@ -7,7 +7,8 @@
   "browser": "min.js",
   "pkg": "min.js",
   "scripts": {
-    "test": "node test.js || exit 0",
+    "browser-test": "echo \"Opening file at http://localhost:8008/test/\" && opn http://localhost:8008/test/ && static -p 8008",
+    "test": "node test/test-cjs.js || exit 0",
     "build": "rollup -c"
   },
   "repository": {
@@ -37,6 +38,8 @@
   },
   "homepage": "https://github.com/WebReflection/tressa#readme",
   "devDependencies": {
+    "node-static": "^0.7.11",
+    "opn-cli": "^3.1.0",
     "rollup": "0.66.2",
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-terser": "^3.0.0"

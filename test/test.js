@@ -1,4 +1,4 @@
-var test = require('./');
+import test from '../esm/index.js';
 
 test.title('Simple Test');
 
