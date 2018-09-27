@@ -1,5 +1,7 @@
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 /*! (c) 2013-2018 Andrea Giammarchi (ISC) */
 /**
  * Fully inspired by the work of John Gruber
@@ -322,6 +324,34 @@ try {
 }
 
 var _reporter = null;
+var addReporter = function (reporter) {
+  _reporter = reporter;
+};
+
+class HTMLReporter {
+  constructor (context, opts) {
+    opts = opts || {};
+    this.context = context || document.body;
+    this.allowHTML = opts.allowHTML;
+  }
+  init () {
+    this.container = document.createElement('li');
+  }
+  report (text, styles) {
+    if (styles) {
+      var span = document.createElement('span');
+      span.setAttribute('style', styles);
+      span[this.allowHTML ? 'innerHTML' : 'textContent'] = text;
+      this.container.append(span);
+    } else {
+      this.container.append(text);
+    }
+  }
+  done (args) {
+    // this.context.append(JSON.stringify(args));
+    this.context.append(this.container);
+  }
+}
 
 /*! (C) 2017 Andrea Giammarchi & Claudio D'angelis */
 
@@ -404,9 +434,9 @@ tressa.log = tressa.console.log;
 tressa.end = function () {
   var title = tressa.testName;
   if (title) {
-    console.log(Array(title.length + 10).join('─'));
+    tressa.console.log(Array(title.length + 10).join('─'));
     console.timeEnd(title);
-    console.log('');
+    tressa.console.log('');
     tressa.testName = '';
   }
 };
@@ -426,4 +456,11 @@ try {
   }
 } catch(o_O) {}
 
-module.exports = tressa;
+const addHTMLReporter = function (context, opts) {
+  addReporter(new HTMLReporter(context, opts));
+};
+
+exports.addHTMLReporter = addHTMLReporter;
+exports.default = tressa;
+
+module.exports = exports.default;

@@ -1,60 +1,71 @@
-import test from '../esm/index.js';
+import {addHTMLReporter, default as test} from '../esm/index.js';
 
-test.title('Simple Test');
+export default function (htmlReporterContext) {
 
-// test directly
-test(1 === 1, '_one_ is _one_');
-test(1); // silent OK
-test(0); // error shown
-test(0 === 1, 'zero is one');
+  if (htmlReporterContext) {
+    addHTMLReporter(htmlReporterContext);
+  }
 
-// same via sync
-test.assert(1);
-test.assert(0);
-test.sync(1, 'all good');
-test.sync(0, 'fail');
+  test.title('Simple Test');
 
-// test asynchronously
-test.async(function (done) {
-  setTimeout(function () {
-    // you can log via Markdown
-    test.log('## Async');
-    test(1, 'Async *OK*');
-    test(0, 'Async *issue*');
-    done();
-  }, 250);
-}).then(function () {
-  test.async(function () {
-    unhandledException();
-  });
-});
+  // test directly
+  test(1 === 1, '_one_ is _one_');
+  test(1); // silent OK
+  test(0); // error shown
+  test(0 === 1, 'zero is one');
 
-// force expiration
-var p = test.async(
-  function goingToExpire(done) {
+  // same via sync
+  test.assert(1);
+  test.assert(0);
+  test.sync(1, 'all good');
+  test.sync(0, 'fail');
+
+  // test asynchronously
+  return test.async(function (done) {
     setTimeout(function () {
-      test.log('## Expired Async');
-      test(0, 'expired');
+      // you can log via Markdown
+      test.log('## Async');
+      test(1, 'Async *OK*');
+      test(0, 'Async *issue*');
       done();
-    },
-    200);
-  },
-  // passing a delay in ms
-  // default timeout is 10000 (10 seconds)
-  100
-);
-if (p) p.catch(function (rej) {
-  test(true, 'expired with: ' + rej);
-});
-
-// test Promise
-if (typeof Promise !== 'undefined') {
-  test.async(function (done) {
-    setTimeout(function () {
-      test.log('## Promise chained Async');
-      done(123);
+    }, 250);
+  }).then(function () {
+    return test.async(function () {
+      unhandledException();
     });
-  }).then(function (value) {
-    test(value === 123, 'Promise invoked');
+  }).catch(function (err) {
+
+  }).then(function () {
+    // force expiration
+    var p = test.async(
+      function goingToExpire(done) {
+        setTimeout(function () {
+          test.log('## Expired Async');
+          test(0, 'expired');
+          done();
+        },
+        200);
+      },
+      // passing a delay in ms
+      // default timeout is 10000 (10 seconds)
+      100
+    );
+    if (p) return p.catch(function (rej) {
+      test(true, 'expired with: ' + rej);
+    });
+  }).then(function () {
+    // test Promise
+    if (typeof Promise !== 'undefined') {
+      return test.async(function (done) {
+        setTimeout(function () {
+          test.log('## Promise chained Async');
+          done(123);
+        });
+      }).then(function (value) {
+        test(value === 123, 'Promise invoked');
+      })
+    }
+  }).then(function () {
+    test.end();
   });
-}
+};

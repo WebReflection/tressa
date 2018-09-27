@@ -1,6 +1,7 @@
 /*! (C) 2017 Andrea Giammarchi & Claudio D'angelis */
 
-import consolemd from 'consolemd';
+import {addReporter, default as consolemd} from 'consolemd';
+import HTMLReporter from 'consolemd/reporters/HTMLReporter';
 
 // used to assert conditions
 // equivalent of console.assert(...args)
@@ -81,9 +82,9 @@ tressa.log = tressa.console.log;
 tressa.end = function () {
   var title = tressa.testName;
   if (title) {
-    console.log(Array(title.length + 10).join('─'));
+    tressa.console.log(Array(title.length + 10).join('─'));
     console.timeEnd(title);
-    console.log('');
+    tressa.console.log('');
     tressa.testName = '';
   }
 };
@@ -102,5 +103,9 @@ try {
     });
   }
 } catch(o_O) {}
+
+export const addHTMLReporter = function (context, opts) {
+  addReporter(new HTMLReporter(context, opts));
+};
 
 export default tressa;

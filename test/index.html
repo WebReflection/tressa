@@ -3,10 +3,21 @@
   <head>
     <meta charset="utf-8">
     <title>Tressa tests</title>
+    <script type="module">
+
+    import htmlReporter from '../reporters/HTMLReporter.js';
+    import tests from './test.js';
+
+    const results = document.querySelector('#results');
+    htmlReporter(results);
+    tests(results);
+
+    </script>
     <script type="module" src="test.js"></script>
   </head>
   <body>
     <h1>Tressa tests</h1>
-    <p><strong><em>Please check the console for the test results...</em></strong></p>
+    <p><strong><em>You may also check the console for test results...</em></strong></p>
+    <div id="results"></div>
   </body>
 </html>

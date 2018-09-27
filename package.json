@@ -7,8 +7,8 @@
   "browser": "min.js",
   "pkg": "min.js",
   "scripts": {
-    "browser-test": "echo \"Opening file at http://localhost:8008/test/\" && opn http://localhost:8008/test/ && static -p 8008",
-    "test": "node test/test-cjs.js || exit 0",
+    "browser-test": "npm run build && echo \"Opening file at http://localhost:8008/test/\" && opn http://localhost:8008/test/ && static -p 8008",
+    "test": "node -e 'require(\"./test/test-cjs.js\")()' || exit 0",
     "build": "rollup -c"
   },
   "repository": {
@@ -45,6 +45,6 @@
     "rollup-plugin-terser": "^3.0.0"
   },
   "dependencies": {
-    "consolemd": "https://github.com/brettz9/consolemd#es"
+    "consolemd": "https://github.com/brettz9/consolemd#reporter"
   }
 }

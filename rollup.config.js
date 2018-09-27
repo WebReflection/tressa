@@ -11,12 +11,14 @@ function getConfig ({format = 'cjs', min = false}) {
     ],
     output: {
       format,
+      exports: 'named',
       file: {
         cjs: `cjs/index${min ? '.min' : ''}.js`,
         es: `esm/index${min ? '.min' : ''}.js`,
         iife: min ? 'min.js' : 'index.js'
       }[format],
-      name: 'tressa'
+      name: 'tressa',
+      outro: format === 'cjs' ? 'module.exports = exports.default;' : ''
     }
   };
 }

@@ -26,7 +26,7 @@ for (var
     // since the console does not support one style per %c
     (function () {
       return function (txt) {
-        var 
+        var
           code = (Object.create || Object)(null),
           multiLineCode = transform.multiLineCode.re,
           singleLineCode = transform.singleLineCode.re,
@@ -38,7 +38,8 @@ for (var
             return $1 + '%c' + getSource($3, code) + '%c';
           },
           out = [],
-          args, i, j, length, css, key;
+          args, i, j, length, css, key
+        ;
 
         // match and hide possible code (which should not be parsed)
         match(txt, 'multiLineCode', out);
@@ -252,9 +253,41 @@ for (var
         return original.apply(console, parse.apply(null, arguments));
       } :
       function () {
-        return arguments.length === 1 && typeof arguments[0] === 'string' ?
-          original.apply(console, parse(arguments[0])) :
-          original.apply(console, arguments);
+        var singleStringArg = arguments.length === 1 && typeof arguments[0] === 'string';
+        var args = singleStringArg ? parse(arguments[0]) : arguments;
+
+        // Todo: We might expose more to the reporter (e.g., returning
+        //   `what` and `match` from the `parse`->`match` function) so
+        //   the user could, e.g., build spans with classes rather than
+        //   inline styles
+        if (_reporter) {
+          var
+            lastIndex, resultInfo,
+            msg = args[0],
+            formattingArgs = args.slice(1),
+            formatRegex = /%c(.*?)(?=%c|$)/g,
+            tmpIndex = 0;
+          _reporter.init();
+          while ((resultInfo = formatRegex.exec(msg)) !== null) {
+            var lastIndex = formatRegex.lastIndex;
+            var result = resultInfo[0];
+            if (result.length > 2) { // Ignore any empty %c's
+              var beginningResultIdx = lastIndex - result.length;
+              if (beginningResultIdx > tmpIndex) {
+                var text = msg.slice(tmpIndex, beginningResultIdx);
+                _reporter.report(text);
+              }
+              _reporter.report(result.slice(2), formattingArgs.splice(0, 1)[0]);
+            }
+            tmpIndex = lastIndex;
+          }
+          if (tmpIndex < msg.length) {
+            var text = msg.slice(tmpIndex);
+            _reporter.report(text);
+          }
+          _reporter.done(args);
+        }
+        return original.apply(console, args);
       }).raw = function () {
         return original.apply(console, arguments);
       };
@@ -285,6 +318,36 @@ try {
     if (!console[key].raw) {
       console[key] = consolemd[key];
     }
+  }
+}
+
+var _reporter = null;
+var addReporter = function (reporter) {
+  _reporter = reporter;
+};
+
+class HTMLReporter {
+  constructor (context, opts) {
+    opts = opts || {};
+    this.context = context || document.body;
+    this.allowHTML = opts.allowHTML;
+  }
+  init () {
+    this.container = document.createElement('li');
+  }
+  report (text, styles) {
+    if (styles) {
+      var span = document.createElement('span');
+      span.setAttribute('style', styles);
+      span[this.allowHTML ? 'innerHTML' : 'textContent'] = text;
+      this.container.append(span);
+    } else {
+      this.container.append(text);
+    }
+  }
+  done (args) {
+    // this.context.append(JSON.stringify(args));
+    this.context.append(this.container);
   }
 }
 
@@ -333,7 +396,7 @@ tressa.async = function (fn, timeout) {
     reject = Object,
     timer = setTimeout(
       function () {
-        var reason = '*timeout (' + timeout + 'ms)* ' + (fn.name || fn);
+        var reason = '*timeout (' + (timeout || tressa.timeout) + 'ms)* ' + (fn.name || fn);
         reject(reason);
         tressa(false, reason);
       },
@@ -369,9 +432,9 @@ tressa.log = tressa.console.log;
 tressa.end = function () {
   var title = tressa.testName;
   if (title) {
-    console.log(Array(title.length + 10).join('─'));
+    tressa.console.log(Array(title.length + 10).join('─'));
     console.timeEnd(title);
-    console.log('');
+    tressa.console.log('');
     tressa.testName = '';
   }
 };
@@ -391,61 +454,78 @@ try {
   }
 } catch(o_O) {}
 
-tressa.title('Simple Test');
+const addHTMLReporter = function (context, opts) {
+  addReporter(new HTMLReporter(context, opts));
+};
 
-// test directly
-tressa(1 === 1, '_one_ is _one_');
-tressa(1); // silent OK
-tressa(0); // error shown
-tressa(0 === 1, 'zero is one');
+function test (htmlReporterContext) {
 
-// same via sync
-tressa.assert(1);
-tressa.assert(0);
-tressa.sync(1, 'all good');
-tressa.sync(0, 'fail');
+  if (htmlReporterContext) {
+    addHTMLReporter(htmlReporterContext);
+  }
 
-// test asynchronously
-tressa.async(function (done) {
-  setTimeout(function () {
-    // you can log via Markdown
-    tressa.log('## Async');
-    tressa(1, 'Async *OK*');
-    tressa(0, 'Async *issue*');
-    done();
-  }, 250);
-}).then(function () {
-  tressa.async(function () {
-    unhandledException();
-  });
-});
+  tressa.title('Simple Test');
 
-// force expiration
-var p = tressa.async(
-  function goingToExpire(done) {
+  // test directly
+  tressa(1 === 1, '_one_ is _one_');
+  tressa(1); // silent OK
+  tressa(0); // error shown
+  tressa(0 === 1, 'zero is one');
+
+  // same via sync
+  tressa.assert(1);
+  tressa.assert(0);
+  tressa.sync(1, 'all good');
+  tressa.sync(0, 'fail');
+
+  // test asynchronously
+  return tressa.async(function (done) {
     setTimeout(function () {
-      tressa.log('## Expired Async');
-      tressa(0, 'expired');
+      // you can log via Markdown
+      tressa.log('## Async');
+      tressa(1, 'Async *OK*');
+      tressa(0, 'Async *issue*');
       done();
-    },
-    200);
-  },
-  // passing a delay in ms
-  // default timeout is 10000 (10 seconds)
-  100
-);
-if (p) p.catch(function (rej) {
-  tressa(true, 'expired with: ' + rej);
-});
-
-// test Promise
-if (typeof Promise !== 'undefined') {
-  tressa.async(function (done) {
-    setTimeout(function () {
-      tressa.log('## Promise chained Async');
-      done(123);
+    }, 250);
+  }).then(function () {
+    return tressa.async(function () {
+      unhandledException();
     });
-  }).then(function (value) {
-    tressa(value === 123, 'Promise invoked');
+  }).catch(function (err) {
+
+  }).then(function () {
+    // force expiration
+    var p = tressa.async(
+      function goingToExpire(done) {
+        setTimeout(function () {
+          tressa.log('## Expired Async');
+          tressa(0, 'expired');
+          done();
+        },
+        200);
+      },
+      // passing a delay in ms
+      // default timeout is 10000 (10 seconds)
+      100
+    );
+    if (p) return p.catch(function (rej) {
+      tressa(true, 'expired with: ' + rej);
+    });
+  }).then(function () {
+    // test Promise
+    if (typeof Promise !== 'undefined') {
+      return tressa.async(function (done) {
+        setTimeout(function () {
+          tressa.log('## Promise chained Async');
+          done(123);
+        });
+      }).then(function (value) {
+        tressa(value === 123, 'Promise invoked');
+      })
+    }
+  }).then(function () {
+    tressa.end();
   });
 }
+
+module.exports = test;

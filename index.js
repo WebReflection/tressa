@@ -1,6 +1,7 @@
 /*! (C) 2017 Andrea Giammarchi & Claudio D'angelis */
 
-import consolemd from 'consolemd';
+import {addReporter, default as consolemd} from 'consolemd';
+import HTMLReporter from 'consolemd/reporters/HTMLReporter';
 
 // used to assert conditions
 // equivalent of console.assert(...args)
@@ -101,6 +102,8 @@ try {
       process.emit('exit');
     });
   }
-} catch(o_O) {}
+} catch(o_O) {
+  addReporter(new HTMLReporter());
+}
 
 export default tressa;
